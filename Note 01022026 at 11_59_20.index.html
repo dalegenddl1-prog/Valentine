@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hiba ❤️ Valentine</title>
+  <style>
+    :root { --bg1:#ffdde1; --bg2:#ee9ca7; --card:#ffffffcc; --text:#1f1f1f; }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0; min-height:100vh; display:grid; place-items:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow:hidden;
+    }
+    .hearts{
+      position:fixed; inset:0; pointer-events:none; opacity:.25;
+      background:
+        radial-gradient(circle at 10% 20%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 80% 30%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 30% 80%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 60% 70%, #fff 0 2px, transparent 3px),
+        radial-gradient(circle at 90% 85%, #fff 0 2px, transparent 3px);
+      animation: float 6s ease-in-out infinite alternate;
+    }
+    @keyframes float { from { transform: translateY(0);} to { transform: translateY(-12px);} }
+
+    .card{
+      width:min(560px, 92vw);
+      background: var(--card);
+      border:1px solid #ffffff70;
+      backdrop-filter: blur(10px);
+      border-radius: 22px;
+      padding: 26px 22px;
+      text-align:center;
+      box-shadow: 0 20px 60px #00000020;
+      position:relative;
+    }
+    h1{ margin: 8px 0 6px; font-size: clamp(26px, 5vw, 40px); color:var(--text); }
+    p{ margin:0 0 18px; font-size: clamp(15px, 2.8vw, 18px); color:#333; line-height:1.4; }
+    .name{
+      display:inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background:#fff;
+      border:1px solid #eee;
+      font-weight:700;
+    }
+
+    .btns{
+      display:flex; gap:12px; justify-content:center; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    button{
+      border:0;
+      padding: 12px 18px;
+      font-size: 16px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight:700;
+      transition: transform .12s ease, box-shadow .12s ease;
+      box-shadow: 0 10px 25px #00000018;
+    }
+    button:active{ transform: scale(.98); }
+    #yes{
+      background: #ff3b7a;
+      color: #fff;
+    }
+    #yes:hover{ transform: translateY(-1px); }
+    #no{
+      background:#ffffff;
+      color:#111;
+      border: 1px solid #eee;
+      position:relative;
+    }
+
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      transform: translateX(-50%);
+      background: #111;
+      color:#fff;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .result{
+      margin-top: 16px;
+      font-weight:800;
+      font-size: 18px;
+      color:#0f5132;
+      display:none;
+    }
+    .result a{
+      display:inline-block; margin-top:10px;
+      color:#0b5ed7; font-weight:800; text-decoration:none;
+      background:#fff; padding:10px 12px; border-radius:12px;
+      border:1px solid #eee;
+    }
+  </style>
+</head>
+<body>
+  <div class="hearts"></div>
+
+  <div class="card">
+    <div style="font-size:34px;">💌</div>
+    <h1>Hey <span class="name">Hiba</span>…</h1>
+    <p>
+      I’ve got one question for you 😌<br/>
+      <b>Will you be my Valentine?</b>
+    </p>
+
+    <div class="btns">
+      <button id="yes">Yes 💖</button>
+      <button id="no" aria-label="No (not possible)">No 🙃</button>
+    </div>
+
+    <div class="result" id="result">
+      ✅ She said YES! 🎉<br/>
+      <span style="color:#333;font-weight:700;">Now send this screenshot to me 😉</span><br/>
+      <a id="copyMsg" href="#">Copy a cute message to send</a>
+    </div>
+  </div>
+
+  <div class="toast" id="toast">Nice try 😄 “No” is disabled.</div>
+
+  <script>
+    const noBtn = document.getElementById('no');
+    const yesBtn = document.getElementById('yes');
+    const toast = document.getElementById('toast');
+    const result = document.getElementById('result');
+    const copyMsg = document.getElementById('copyMsg');
+
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(showToast.t);
+      showToast.t = setTimeout(() => toast.classList.remove('show'), 1200);
+    }
+
+    function moveNo(){
+      // Move the "No" button randomly within the viewport
+      const pad = 16;
+      const maxX = window.innerWidth - noBtn.offsetWidth - pad;
+      const maxY = window.innerHeight - noBtn.offsetHeight - pad;
+      const x = Math.max(pad, Math.floor(Math.random() * maxX));
+      const y = Math.max(pad, Math.floor(Math.random() * maxY));
+
+      noBtn.style.position = 'fixed';
+      noBtn.style.left = x + 'px';
+      noBtn.style.top = y + 'px';
+      showToast("Nope 😄 You can’t click No.");
+    }
+
+    // Make "No" impossible to click (runs away)
+    noBtn.addEventListener('mouseenter', moveNo);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); moveNo(); }, {passive:false});
+    noBtn.addEventListener('click', (e) => { e.preventDefault(); moveNo(); });
+
+    // YES flow
+    yesBtn.addEventListener('click', () => {
+      result.style.display = 'block';
+      yesBtn.textContent = "Yesss 💞";
+      showToast("Perfect choice 😍");
+    });
+
+    copyMsg.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const msg = "Hiba, I choose you 💖 Happy Valentine’s! 🌹";
+      try{
+        await navigator.clipboard.writeText(msg);
+        showToast("Copied! Paste it in chat ✅");
+      }catch{
+        showToast("Copy not supported here 😅");
+      }
+    });
+  </script>
+</body>
+</html>
